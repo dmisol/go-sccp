@@ -1,6 +1,9 @@
 package sccp
 
-import "github.com/wmnsk/go-sccp/params"
+import (
+	"fmt"
+	"github.com/wmnsk/go-sccp/params"
+)
 
 /*
 	RLSD (released)
@@ -21,23 +24,23 @@ var rlsCauses map[uint8]string
 
 func init() {
 	rlsCauses = make(map[uint8]string)
-	rlsCauses[0b00000000] = "End user originated"
-	rlsCauses[0b00000001] = "End user congestion"
-	rlsCauses[0b00000010] = "End user failure"
-	rlsCauses[0b00000011] = "SCCP user originated"
-	rlsCauses[0b00000100] = "Remote procedure error"
-	rlsCauses[0b00000101] = "Inconsistent connection data"
-	rlsCauses[0b00000110] = "Access failure"
-	rlsCauses[0b00000111] = "Access congestion"
-	rlsCauses[0b00001000] = "Subsystem failure"
-	rlsCauses[0b00001001] = "Subsystem congestion"
-	rlsCauses[0b00001010] = "MTP failure"
-	rlsCauses[0b00001011] = "Network congestion"
-	rlsCauses[0b00001100] = "Expiration of reset timer"
-	rlsCauses[0b00001101] = "Expiration of receive inactivity timer"
-	rlsCauses[0b00001110] = "Reserved"
-	rlsCauses[0b00001111] = "Unqualified"
-	rlsCauses[0b00010000] = "SCCP failure"
+	rlsCauses[0x0] = "End user originated"
+	rlsCauses[0x1] = "End user congestion"
+	rlsCauses[0x2] = "End user failure"
+	rlsCauses[0x3] = "SCCP user originated"
+	rlsCauses[0x4] = "Remote procedure error"
+	rlsCauses[0x5] = "Inconsistent connection data"
+	rlsCauses[0x6] = "Access failure"
+	rlsCauses[0x7] = "Access congestion"
+	rlsCauses[0x8] = "Subsystem failure"
+	rlsCauses[0x9] = "Subsystem congestion"
+	rlsCauses[0x0a] = "MTP failure"
+	rlsCauses[0x0b] = "Network congestion"
+	rlsCauses[0x0c] = "Expiration of reset timer"
+	rlsCauses[0x0d] = "Expiration of receive inactivity timer"
+	rlsCauses[0x0e] = "Reserved"
+	rlsCauses[0x0f] = "Unqualified"
+	rlsCauses[0x10] = "SCCP failure"
 	// 00010001 - 11110011  are reserved for international use
 }
 
@@ -59,4 +62,52 @@ func (m RLSD) RlsCauseName() string {
 		return "Other"
 	}
 	return name
+}
+
+func ParseRLSD(b []byte) (*RLSD, error) {
+	msg := new(RLSD)
+	// Type
+	msg.Type = MsgType(b[0])
+	if msg.Type != MsgTypeRLSD {
+		return nil, fmt.Errorf("is not a RLSD message")
+	}
+	// @todo: Destination local reference
+	// ...
+	// @todo: Source local reference
+	// ...
+	// RlsCause
+	msg.RlsCause = b[7]
+	return msg, nil
+}
+
+// @todo
+// func (msg RLSD) UnmarshalBinary(b []byte) error {
+// }
+
+// @todo
+// func (msg RLSD) MarshalBinary() ([]byte, error) {
+// }
+
+// @todo
+// func (msg RLSD) MarshalLen() int {
+// }
+
+// @todo
+// func (msg RLSD) MarshalTo(b []byte) error {
+// }
+
+// @todo
+// func (msg RLSD) String() string {
+// }
+
+// @todo
+// func (msg RLSD) parseOptional(b []byte) error {
+// }
+
+func (msg RLSD) MessageType() MsgType {
+	return msg.Type
+}
+
+func (msg RLSD) MessageTypeName() string {
+	return "RLSD"
 }
