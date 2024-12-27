@@ -10,7 +10,7 @@ var validRLSDMock []byte = []byte{0x4, 0x0, 0x3, 0x8c, 0x0, 0x60, 0x4e, 0x0d, 0x
 func TestRLSDType(t *testing.T) {
 	msg, err := ParseRLSD(validRLSDMock)
 	if err != nil {
-		t.Fatal(err)
+		t.FailNow()
 	}
 	if msg.Type != MsgTypeRLSD {
 		t.Fatal("Msg is not a RLSD")

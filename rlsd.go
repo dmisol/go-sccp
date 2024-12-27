@@ -2,11 +2,18 @@ package sccp
 
 import (
 	"fmt"
+	"io"
 	"github.com/wmnsk/go-sccp/params"
 )
 
 /*
 	RLSD (released)
+	Table 6/Q.713 − Message type: Released
+
+	The RLSD message contains:
+	- one pointer;
+	- the parameters indicated in Table 6.
+
 	Table 6/Q.713 − Message type: Released
 
 	Parameter						Clause		Type (F V O)	Length (octets)
@@ -41,19 +48,18 @@ func init() {
 	rlsCauses[0x0e] = "Reserved"
 	rlsCauses[0x0f] = "Unqualified"
 	rlsCauses[0x10] = "SCCP failure"
-	// 00010001 - 11110011  are reserved for international use
+	// 00010001 - 11110011  are reserved for the international use
 }
 
 type RLSD struct {
 	// Mand:
 	Type		MsgType
-	DstLocRef	*params.PartyAddress
-	SrcLocRef	*params.PartyAddress
+	DstLocRef	params.LocalReference
+	SrcLocRef	params.LocalReference
 	RlsCause	uint8
 	// Opt:
 	Data		*params.Optional
-	Importance	*params.Optional
-	EOOptParam	*params.Optional
+	Importance	*params.Optional // 0-7
 }
 
 func (m RLSD) RlsCauseName() string {
@@ -66,23 +72,72 @@ func (m RLSD) RlsCauseName() string {
 
 func ParseRLSD(b []byte) (*RLSD, error) {
 	msg := new(RLSD)
-	// Type
-	msg.Type = MsgType(b[0])
-	if msg.Type != MsgTypeRLSD {
-		return nil, fmt.Errorf("is not a RLSD message")
+	if err := msg.UnmarshalBinary(b); err != nil {
+		return nil, err
 	}
-	// @todo: Destination local reference
-	// ...
-	// @todo: Source local reference
-	// ...
-	// RlsCause
-	msg.RlsCause = b[7]
 	return msg, nil
 }
 
 // @todo
-// func (msg RLSD) UnmarshalBinary(b []byte) error {
-// }
+func (msg *RLSD) UnmarshalBinary(b []byte) error {
+	l := len(b)
+	var minLenB int = 0 +
+		1 + // Message type
+		3 + // Destination local reference
+		3 + // Source local reference
+		1 +	// Release cause
+		1	// Pointer to the optional parameter
+	if l <= minLenB {
+		return io.ErrUnexpectedEOF
+	}
+
+	// MANDATORY:
+
+	// Mand: Message type
+	msg.Type = MsgType(b[0])
+	if msg.Type != MsgTypeRLSD {
+		return fmt.Errorf("is not a RLSD message")
+	}
+
+	// Mand: Destination local reference
+	if err := msg.DstLocRef.Read(b[1:4]); err != nil {
+		return err
+	}
+
+	// Mand: Source local reference
+	if err := msg.SrcLocRef.Read(b[4:7]); err != nil {
+		return err
+	}
+
+	// Mand: Release cause
+	msg.RlsCause = b[7]
+
+	// OPTIONAL:
+
+	var byteIdx int = 8
+	optPrmsPtr := int(b[byteIdx])
+
+	if optPrmsPtr == 0x0 { // No optional parameters
+		return nil
+	}
+
+	opts, err := ParseOptionalParameters(b[byteIdx+optPrmsPtr:])
+	if err != nil {
+		return err
+	}
+
+	// Opt: data
+	if opt, ok := opts[params.DataTag]; ok {
+		msg.Data = opt
+	}
+
+	// Opt: importance
+	if opt, ok := opts[params.ImportanceTag]; ok {
+		msg.Importance = opt
+	}
+
+	return nil
+}
 
 // @todo
 // func (msg RLSD) MarshalBinary() ([]byte, error) {
@@ -98,10 +153,6 @@ func ParseRLSD(b []byte) (*RLSD, error) {
 
 // @todo
 // func (msg RLSD) String() string {
-// }
-
-// @todo
-// func (msg RLSD) parseOptional(b []byte) error {
 // }
 
 func (msg RLSD) MessageType() MsgType {

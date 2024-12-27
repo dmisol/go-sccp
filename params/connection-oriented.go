@@ -3,8 +3,22 @@ package params
 import "fmt"
 
 const (
-	DataTag      uint8 = 0x0F
-	CgPtyAddrTag uint8 = 0x04
+	CgPtyAddrTag			uint8 = 0x04
+	ProtocolClassTag		uint8 = 0x05
+	// @todo: Segmenting/reassembling
+	// @todo: Receive sequence number
+	// @todo: Sequencing/segmenting
+	CreditTag				uint8 = 0x09
+	ReleaseCauseTag			uint8 = 0x0A
+	// @todo: Return cause
+	// @todo: Reset cause
+	// @todo: Error cause
+	// @todo: Refusal cause
+	DataTag					uint8 = 0x0F
+	// @todo: Segmentation
+	HopCounterTag 			uint8 = 0x11
+	ImportanceTag 			uint8 = 0x12
+	// @todo: Long data
 )
 
 type LocalReference struct {
@@ -30,4 +44,5 @@ type Optional struct {
 	Tag   uint8
 	Len   uint8
 	Value []byte
+	Ptr   uint8
 }

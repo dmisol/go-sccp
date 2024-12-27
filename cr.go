@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-
 	"github.com/wmnsk/go-sccp/params"
 )
 
@@ -63,63 +62,103 @@ func (msg *CR) UnmarshalBinary(b []byte) error {
 	if l < (5 + msg.mptr + 2) {
 		return io.ErrUnexpectedEOF
 	}
+
 	msg.optr = b[6]
 	if l < (6 + msg.optr + 1) {
 		return io.ErrUnexpectedEOF
 	}
 
 	var err error
-	if msg.CalledPartyAddress, err = params.ParsePartyAddress(b[5+msg.mptr : 6+msg.optr]); err != nil {
+	if msg.CalledPartyAddress, err = params.ParsePartyAddress(b[5 + msg.mptr : 6+msg.optr]); err != nil {
 		return err
 	}
 	if msg.optr == 0 {
 		return nil
 	}
-	return msg.parseOptional(b[6+msg.optr:])
-}
 
-func (msg *CR) parseOptional(b []byte) error {
-	// fmt.Println(hex.EncodeToString(b))
-	p := uint8(0)
-	for p < uint8(len(b)) {
-		t := b[p]
-
-		if t == 0 {
-			return nil
-		}
-		if (p + 1) >= uint8(len(b)) {
-			return io.ErrUnexpectedEOF
-		}
-
-		l := b[p+1]
-		if (p + 1 + l) >= uint8(len(b)) {
-			return io.ErrUnexpectedEOF
-		}
-
-		o := &params.Optional{
-			Tag:   t,
-			Len:   l,
-			Value: b[p+2 : p+2+l],
-		}
-
-		switch t {
-		case params.DataTag:
-			msg.Data = o
-		case params.CgPtyAddrTag:
-			var err error
-			msg.CallingPartyAddress, err = params.ParsePartyAddress(b[p : p+2+l])
-			if err != nil {
-				return err
-			}
-		}
-
-		msg.Opts = append(msg.Opts, o)
-		p += 2 + l
-
+	opts, err := ParseOptionalParameters(b[6+msg.optr:])
+	if err != nil {
+		return err
 	}
 
+	// Opt: Credit
+	if opt, ok := opts[params.CreditTag]; ok {
+		msg.Opts = append(msg.Opts, opt)
+	}
+
+	// Opt: Calling party address
+	if opt, ok := opts[params.CgPtyAddrTag]; ok {
+		ptr := opt.Ptr
+		len := opt.Len
+		cgPtyAddrTag, err := params.ParsePartyAddress(b[ptr:ptr+2+len])
+		if err != nil {
+			return err
+		}
+		msg.CallingPartyAddress = cgPtyAddrTag
+	}
+
+	// Opt: Data
+	if opt, ok := opts[params.DataTag]; ok {
+		msg.Data = opt
+	}
+
+	// Opt: Hop counter
+	if opt, ok := opts[params.HopCounterTag]; ok {
+		msg.Opts = append(msg.Opts, opt)
+	}
+
+	// Opt: Importance
+	if opt, ok := opts[params.ImportanceTag]; ok {
+		msg.Opts = append(msg.Opts, opt)
+	}
+
+	// return msg.parseOptional(b[6+msg.optr:])
 	return nil
+
 }
+
+// func (msg *CR) parseOptional(b []byte) error {
+// 	// fmt.Println(hex.EncodeToString(b))
+// 	p := uint8(0)
+// 	for p < uint8(len(b)) {
+// 		t := b[p]
+
+// 		if t == 0 {
+// 			return nil
+// 		}
+// 		if (p + 1) >= uint8(len(b)) {
+// 			return io.ErrUnexpectedEOF
+// 		}
+
+// 		l := b[p+1]
+// 		if (p + 1 + l) >= uint8(len(b)) {
+// 			return io.ErrUnexpectedEOF
+// 		}
+
+// 		o := &params.Optional{
+// 			Tag:   t,
+// 			Len:   l,
+// 			Value: b[p+2 : p+2+l],
+// 		}
+
+// 		switch t {
+// 		case params.DataTag:
+// 			msg.Data = o
+// 		case params.CgPtyAddrTag:
+// 			var err error
+// 			msg.CallingPartyAddress, err = params.ParsePartyAddress(b[p : p+2+l])
+// 			if err != nil {
+// 				return err
+// 			}
+// 		}
+
+// 		msg.Opts = append(msg.Opts, o)
+// 		p += 2 + l
+
+// 	}
+
+// 	return nil
+// }
 
 // MarshalBinary returns the byte sequence generated from a UDT instance.
 func (msg *CR) MarshalBinary() ([]byte, error) {
