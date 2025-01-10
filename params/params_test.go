@@ -9,8 +9,8 @@ import (
 	"io"
 	"testing"
 
+	"github.com/dmisol/go-sccp/params"
 	"github.com/pascaldekloe/goe/verify"
-	"github.com/wmnsk/go-sccp/params"
 )
 
 type serializable interface {

@@ -9,7 +9,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/wmnsk/go-sccp/utils"
+	"github.com/dmisol/go-sccp/utils"
 )
 
 // PartyAddress is a SCCP parameter that represents a Called/Calling Party Address.

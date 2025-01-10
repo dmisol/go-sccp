@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/wmnsk/go-sccp/utils"
+	"github.com/dmisol/go-sccp/utils"
 )
 
 type DT1 struct {
