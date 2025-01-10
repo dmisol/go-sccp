@@ -28,6 +28,19 @@ func TestCC(t *testing.T) {
 
 			t.Fatal(i, err)
 		}
+
+		n := NewCC(cc.DestinationLocalReference, cc.SourceLocalReference, cc.Opts)
+		b2, err := n.MarshalBinary()
+		if err != nil {
+			t.Fatal(i, err)
+		}
+		if !bytes.Equal(v, b2) {
+			fmt.Println(hex.EncodeToString(v))
+			fmt.Println(hex.EncodeToString(b2))
+
+			t.Fatal(i, err)
+		}
+
 		fmt.Println(cc)
 	}
 }

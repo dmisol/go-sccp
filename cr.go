@@ -9,6 +9,17 @@ import (
 	"github.com/dmisol/go-sccp/utils"
 )
 
+func NewCR(slr uint32, cdpty *params.PartyAddress, opts []*params.Optional) *CR {
+	cr := &CR{
+		Type:                 MsgTypeCR,
+		SourceLocalReference: slr,
+		ProtocolClass:        0x02,
+		CalledPartyAddress:   cdpty,
+		Opts:                 opts,
+	}
+	return cr
+}
+
 type CR struct {
 	Type                 MsgType
 	SourceLocalReference uint32
@@ -21,9 +32,6 @@ type CR struct {
 	// similar objects are expected to be found in Opts
 	Data                *params.Optional
 	CallingPartyAddress *params.PartyAddress
-
-	mptr uint8
-	optr uint8
 }
 
 func ParseCR(b []byte) (*CR, error) {
@@ -45,23 +53,23 @@ func (msg *CR) UnmarshalBinary(b []byte) error {
 	msg.SourceLocalReference = utils.Uint24To32(b[1:4])
 	msg.ProtocolClass = params.ProtocolClass(b[4])
 
-	msg.mptr = b[5]
-	if l < (5 + msg.mptr + 2) {
+	mptr := b[5]
+	if l < (5 + mptr + 2) {
 		return io.ErrUnexpectedEOF
 	}
-	msg.optr = b[6]
-	if l < (6 + msg.optr + 1) {
+	optr := b[6]
+	if l < (6 + optr + 1) {
 		return io.ErrUnexpectedEOF
 	}
 
 	var err error
-	if msg.CalledPartyAddress, err = params.ParsePartyAddress(b[5+msg.mptr : 6+msg.optr]); err != nil {
+	if msg.CalledPartyAddress, err = params.ParsePartyAddress(b[5+mptr : 6+optr]); err != nil {
 		return err
 	}
-	if msg.optr == 0 {
+	if optr == 0 {
 		return nil
 	}
-	return msg.parseOptional(b[6+msg.optr:])
+	return msg.parseOptional(b[6+optr:])
 }
 
 func (msg *CR) parseOptional(b []byte) error {

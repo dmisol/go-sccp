@@ -24,5 +24,18 @@ func TestCR(t *testing.T) {
 
 		t.Fatal(err)
 	}
+
+	n := NewCR(cr.SourceLocalReference, cr.CalledPartyAddress, cr.Opts)
+	b2, err := n.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(mockPagingCR, b2) {
+		fmt.Println(hex.EncodeToString(mockPagingCR))
+		fmt.Println(hex.EncodeToString(b2))
+
+		t.Fatal(err)
+	}
+
 	fmt.Println(cr)
 }

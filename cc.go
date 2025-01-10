@@ -8,6 +8,17 @@ import (
 	"github.com/dmisol/go-sccp/utils"
 )
 
+func NewCC(dlr uint32, slr uint32, opts []*params.Optional) *CC {
+	cc := &CC{
+		Type:                      MsgTypeCC,
+		DestinationLocalReference: dlr,
+		SourceLocalReference:      slr,
+		ProtocolClass:             0x02,
+		Opts:                      opts,
+	}
+	return cc
+}
+
 type CC struct {
 	Type                      MsgType
 	DestinationLocalReference uint32
