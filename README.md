@@ -2,10 +2,10 @@
 
 Package sccp provides simple and painless handling of SCCP (Signaling Connection Control Part) in SS7/SIGTRAN stack, implemented in the Go Programming Language.
 
-[![CI status](https://github.com/wmnsk/go-sccp/actions/workflows/go.yml/badge.svg)](https://github.com/wmnsk/go-sccp/actions/workflows/go.yml)
-[![golangci-lint](https://github.com/wmnsk/go-sccp/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/wmnsk/go-sccp/actions/workflows/golangci-lint.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/wmnsk/go-sccp.svg)](https://pkg.go.dev/github.com/wmnsk/go-sccp)
-[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/wmnsk/go-sccp/blob/master/LICENSE)
+[![CI status](https://github.com/dmisol/go-sccp/actions/workflows/go.yml/badge.svg)](https://github.com/dmisol/go-sccp/actions/workflows/go.yml)
+[![golangci-lint](https://github.com/dmisol/go-sccp/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/dmisol/go-sccp/actions/workflows/golangci-lint.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/dmisol/go-sccp.svg)](https://pkg.go.dev/github.com/dmisol/go-sccp)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/dmisol/go-sccp/blob/master/LICENSE)
 
 ## Disclaimer
 
@@ -73,4 +73,4 @@ Yoshiyuki Kurauchi ([Website](https://wmnsk.com/))
 
 ## LICENSE
 
-[MIT](https://github.com/wmnsk/go-sccp/blob/master/LICENSE)
+[MIT](https://github.com/dmisol/go-sccp/blob/master/LICENSE)
