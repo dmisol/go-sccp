@@ -15,14 +15,14 @@ import (
 	"syscall"
 	"time"
 
+	m3params "github.com/dmisol/go-m3ua/messages/params"
 	"github.com/ishidawataru/sctp"
-	m3params "github.com/wmnsk/go-m3ua/messages/params"
 
-	"github.com/wmnsk/go-sccp"
-	"github.com/wmnsk/go-sccp/params"
-	"github.com/wmnsk/go-sccp/utils"
+	"github.com/dmisol/go-sccp"
+	"github.com/dmisol/go-sccp/params"
+	"github.com/dmisol/go-sccp/utils"
 
-	"github.com/wmnsk/go-m3ua"
+	"github.com/dmisol/go-m3ua"
 )
 
 func main() {
