@@ -30,6 +30,19 @@ func TestDT1(t *testing.T) {
 
 			t.Fatal(i, err)
 		}
+
+		n := NewDT1(dt1.DestinationLocalReference, dt1.Data)
+		b2, err := n.MarshalBinary()
+		if err != nil {
+			t.Fatal(i, err)
+		}
+		if !bytes.Equal(v, b2) {
+			fmt.Println(hex.EncodeToString(v))
+			fmt.Println(hex.EncodeToString(b2))
+
+			t.Fatal(i, err)
+		}
+
 		fmt.Println(dt1)
 	}
 }

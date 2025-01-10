@@ -24,5 +24,18 @@ func TestRLC(t *testing.T) {
 
 		t.Fatal(err)
 	}
+
+	n := NewRLC(r.DestinationLocalReference, r.SourceLocalReference)
+	b2, err := n.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(mockRLC, b2) {
+		fmt.Println(hex.EncodeToString(mockRLC))
+		fmt.Println(hex.EncodeToString(b2))
+
+		t.Fatal(err)
+	}
+
 	fmt.Println(r)
 }

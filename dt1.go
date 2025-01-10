@@ -8,6 +8,16 @@ import (
 	"github.com/dmisol/go-sccp/utils"
 )
 
+func NewDT1(dlr uint32, data []byte) *DT1 {
+	dt1 := &DT1{
+		Type:                      MsgTypeDT1,
+		DestinationLocalReference: dlr,
+		Segmenting:                0,
+		Data:                      data,
+	}
+	return dt1
+}
+
 type DT1 struct {
 	Type                      MsgType
 	DestinationLocalReference uint32

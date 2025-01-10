@@ -6,6 +6,15 @@ import (
 	"github.com/dmisol/go-sccp/utils"
 )
 
+func NewRLC(dlr, slr uint32) *RLC {
+	rlc := &RLC{
+		Type:                      MsgTypeRLC,
+		DestinationLocalReference: dlr,
+		SourceLocalReference:      slr,
+	}
+	return rlc
+}
+
 type RLC struct {
 	Type                      MsgType
 	DestinationLocalReference uint32
