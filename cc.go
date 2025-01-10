@@ -5,23 +5,13 @@ import (
 	"io"
 
 	"github.com/wmnsk/go-sccp/params"
+	"github.com/wmnsk/go-sccp/utils"
 )
 
-/*
-Message type 2.1 F 1
-Destination local reference 3.2 F 3
-Source local reference 3.3 F 3
-Protocol class 3.6 F 1
-Credit 3.10 O 3
-Called party address 3.4 O 4 minimum
-Data 3.16 O 3-130
-Importance 3.19 O 3
-End of optional parameter 3.1 O 1
-*/
 type CC struct {
 	Type                      MsgType
-	DestinationLocalReference params.LocalReference
-	SourceLocalReference      params.LocalReference
+	DestinationLocalReference uint32
+	SourceLocalReference      uint32
 	params.ProtocolClass
 
 	Opts []*params.Optional
@@ -30,6 +20,7 @@ type CC struct {
 	CalledPartyAddress *params.PartyAddress
 }
 
+// ParseCC decodes given byte sequence as a SCCP CC.
 func ParseCC(b []byte) (*CC, error) {
 	msg := &CC{}
 	if err := msg.UnmarshalBinary(b); err != nil {
@@ -47,12 +38,8 @@ func (msg *CC) UnmarshalBinary(b []byte) error {
 	}
 
 	msg.Type = MsgType(b[0])
-	if err := msg.DestinationLocalReference.Read(b[1:4]); err != nil {
-		return err
-	}
-	if err := msg.SourceLocalReference.Read(b[4:7]); err != nil {
-		return err
-	}
+	msg.DestinationLocalReference = utils.Uint24To32(b[1:4])
+	msg.SourceLocalReference = utils.Uint24To32(b[4:7])
 
 	msg.ProtocolClass = params.ProtocolClass(b[7])
 
@@ -107,13 +94,12 @@ func (msg *CC) parseOptional(b []byte) error {
 
 		msg.Opts = append(msg.Opts, o)
 		p += 2 + l
-
 	}
 
 	return nil
 }
 
-// MarshalBinary returns the byte sequence generated from a UDT instance.
+// MarshalBinary returns the byte sequence generated from a CC instance.
 func (msg *CC) MarshalBinary() ([]byte, error) {
 	b := make([]byte, msg.MarshalLen())
 	if err := msg.MarshalTo(b); err != nil {
@@ -135,10 +121,12 @@ func (msg *CC) MarshalLen() int {
 	return l
 }
 
+// MarshalTo puts the byte sequence in the byte array given as b.
+// SCCP is dependent on the Pointers when serializing, which means that it might fail when invalid Pointers are set.
 func (msg *CC) MarshalTo(b []byte) error {
 	b[0] = uint8(msg.Type)
-	msg.DestinationLocalReference.Read(b[1:4])
-	msg.SourceLocalReference.Read(b[4:7])
+	copy(b[1:4], utils.Uint32To24(msg.DestinationLocalReference))
+	copy(b[4:7], utils.Uint32To24(msg.SourceLocalReference))
 	b[7] = byte(msg.ProtocolClass)
 
 	if len(msg.Opts) == 0 {
@@ -171,5 +159,5 @@ func (msg *CC) MessageType() MsgType {
 }
 
 func (msg *CC) MessageTypeName() string {
-	return "CR"
+	return "CC"
 }

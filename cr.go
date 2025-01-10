@@ -6,24 +6,12 @@ import (
 	"io"
 
 	"github.com/wmnsk/go-sccp/params"
+	"github.com/wmnsk/go-sccp/utils"
 )
-
-/*
-Message type code 2.1 F 1
-Source local reference 3.3 F 3
-Protocol class 3.6 F 1
-Called party address 3.4 V 3 minimum
-Credit 3.10 O 3
-Calling party address 3.5 O 4 minimum
-Data 3.16 O 3-130
-Hop counter 3.18 O 3
-Importance 3.19 O 3
-End of optional parameters 3.1 O 1
-*/
 
 type CR struct {
 	Type                 MsgType
-	SourceLocalReference params.LocalReference
+	SourceLocalReference uint32
 	params.ProtocolClass
 	CalledPartyAddress *params.PartyAddress
 
@@ -54,9 +42,7 @@ func (msg *CR) UnmarshalBinary(b []byte) error {
 	}
 
 	msg.Type = MsgType(b[0])
-	if err := msg.SourceLocalReference.Read(b[1:4]); err != nil {
-		return err
-	}
+	msg.SourceLocalReference = utils.Uint24To32(b[1:4])
 	msg.ProtocolClass = params.ProtocolClass(b[4])
 
 	msg.mptr = b[5]
@@ -120,7 +106,7 @@ func (msg *CR) parseOptional(b []byte) error {
 	return nil
 }
 
-// MarshalBinary returns the byte sequence generated from a UDT instance.
+// MarshalBinary returns the byte sequence generated from a CR instance.
 func (msg *CR) MarshalBinary() ([]byte, error) {
 	b := make([]byte, msg.MarshalLen())
 	if err := msg.MarshalTo(b); err != nil {
@@ -142,7 +128,7 @@ func (msg *CR) MarshalLen() int {
 
 func (msg *CR) MarshalTo(b []byte) error {
 	b[0] = uint8(msg.Type)
-	msg.SourceLocalReference.Read(b[1:4])
+	copy(b[1:4], utils.Uint32To24(msg.SourceLocalReference))
 	b[4] = byte(msg.ProtocolClass)
 	b[5] = 2
 	b[6] = msg.CalledPartyAddress.Length + 2
