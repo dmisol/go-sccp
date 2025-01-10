@@ -7,8 +7,8 @@ package utils_test
 import (
 	"testing"
 
+	"github.com/dmisol/go-sccp/utils"
 	"github.com/google/go-cmp/cmp"
-	"github.com/wmnsk/go-sccp/utils"
 )
 
 func TestBCDEncoding(t *testing.T) {

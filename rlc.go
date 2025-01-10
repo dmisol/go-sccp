@@ -3,7 +3,7 @@ package sccp
 import (
 	"io"
 
-	"github.com/wmnsk/go-sccp/utils"
+	"github.com/dmisol/go-sccp/utils"
 )
 
 type RLC struct {

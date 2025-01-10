@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/wmnsk/go-sccp/params"
-	"github.com/wmnsk/go-sccp/utils"
+	"github.com/dmisol/go-sccp/params"
+	"github.com/dmisol/go-sccp/utils"
 )
 
 type CC struct {
