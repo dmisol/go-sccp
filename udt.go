@@ -124,11 +124,11 @@ func (u *UDT) UnmarshalBinary(b []byte) error {
 	}
 
 	var err error
-	u.CalledPartyAddress, err = params.ParsePartyAddress(b[5:int(u.Ptr2+3)])
+	u.CalledPartyAddress, err = params.ParsePartyAddress(b[int(2+u.Ptr1) : int(3+u.Ptr1)+int(b[int(2+u.Ptr1)])])
 	if err != nil {
 		return err
 	}
-	u.CallingPartyAddress, err = params.ParsePartyAddress(b[int(u.Ptr2+3):int(u.Ptr3+4)])
+	u.CallingPartyAddress, err = params.ParsePartyAddress(b[int(3+u.Ptr2) : int(4+u.Ptr2)+int(b[int(3+u.Ptr2)])])
 	if err != nil {
 		return err
 	}
